@@ -1,0 +1,33 @@
+name: Mark Odoo task as done
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  mark-task-done:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark Odoo task as done
+        env:
+          ODOO_BASE_URL: ${{ secrets.ODOO_BASE_URL }}
+          ODOO_DATABASE: ${{ secrets.ODOO_DATABASE }}
+          ODOO_API_KEY:  ${{ secrets.ODOO_API_KEY }}
+          COMMIT_MSG:    ${{ github.event.head_commit.message }}
+        run: |
+
+          set -euo pipefail
+
+          # Extract the task id from the commit message
+          task_id=$(printf '%s\n' "$COMMIT_MSG" \
+                  | grep -E '^task-[0-9]+$' \
+                  | sed s/task-// || true)
+
+          # No task: bail
+          if [ -z "${task_id:-}" ]; then
+            echo "No task-<id> reference in commit message; nothing to do."
+            exit 0
+          fi
+
+          # Mark $task_id done
+          echo "Marking task $task_id as done..."
