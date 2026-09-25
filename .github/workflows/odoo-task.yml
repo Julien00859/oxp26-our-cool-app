@@ -32,3 +32,11 @@ jobs:
 
           # Mark $task_id done
           echo "Marking task $task_id as done..."
+
+          curl $ODOO_BASE_URL/json/2/project.task/write \
+            -X POST \
+            --oauth2-bearer $ODOO_API_KEY \
+            -H "X-Odoo-Database: $ODOO_DATABASE" \
+            -H "Content-Type: application/json" \
+            -d "{\"ids\":[$task_id],\"vals\":{\"stage_id\":3}}"
+
